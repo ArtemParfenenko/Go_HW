@@ -1,4 +1,4 @@
-package hw1_tree
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	if e := dirTree(os.Stdout, "testdata", false); e != nil {
+	if e := dirTree(os.Stdout, "testdata", true); e != nil {
 		panic(e)
 	}
 }
