@@ -4,10 +4,8 @@ import (
 	"entity"
 	"strconv"
 	"sync"
+	"util"
 )
-
-var mutexChannel = make(chan struct{}, 1)
-var mutex = &sync.Mutex{}
 
 func ExecutePipeline(jobs []job) {
 	var previousOutAndCurrentIn chan interface{}
@@ -33,13 +31,13 @@ func CalculateSingleHash(in, out chan interface{}) {
 		waitGroup.Add(1)
 		go func(value interface{}) {
 			defer waitGroup.Done()
-			out <- calculateSingleHash(value)
+			out <- calculateSingleHash(value, util.MutexExecutor)
 		}(val)
 	}
 	waitGroup.Wait()
 }
 
-func calculateSingleHash(val interface{}) string {
+func calculateSingleHash(val interface{}, syncExecutor util.SyncExecutor) string {
 	decimal, ok := val.(int)
 	if !ok {
 		panic("The input data is not int !")
@@ -47,17 +45,9 @@ func calculateSingleHash(val interface{}) string {
 	str := strconv.Itoa(decimal)
 	var md5Value string
 
-	func(syncChannel chan struct{}) {
-		syncChannel <- struct{}{}
-		defer func() {
-			<-syncChannel
-		}()
+	syncExecutor(func() {
 		md5Value = DataSignerMd5(str)
-	}(mutexChannel)
-
-	/*mutex.Lock()
-	md5Value = DataSignerMd5(str)
-	mutex.Unlock()*/
+	})
 
 	crc32ValueHolder := new(entity.Crc32ValueHolder)
 	crc32ValueHolder.SetValue(str)

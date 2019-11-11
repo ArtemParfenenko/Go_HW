@@ -12,7 +12,6 @@ var multiHashMutex = &sync.Mutex{}
 func (multiHash *MultiHash) AppendPart(partId, part string) {
 	multiHashMutex.Lock()
 	(*multiHash)[partId] = part
-	//fmt.Println(partId, " ", part)
 	multiHashMutex.Unlock()
 }
 
@@ -25,9 +24,7 @@ func (multiHash *MultiHash) GetMultiHash() string {
 	sort.Strings(keys)
 
 	for _, key := range keys {
-		//fmt.Print(len(*multiHash))
 		result += (*multiHash)[key]
 	}
-	//fmt.Println()
 	return result
 }
