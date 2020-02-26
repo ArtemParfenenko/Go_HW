@@ -1,2 +1,5 @@
 */.idea
 *.iml
+
+hw3_bench/*.out
+hw3_bench/*.test
